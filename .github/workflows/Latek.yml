@@ -33,10 +33,12 @@ jobs:
           #pre_compile: "tlmgr update --self --all"
           args: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode -logfilewarninglist -Werror"
           post_compile: "latexmk -c"
+      
       - name: Split log
         if: failure()
         shell: bash
-        run: cat main.log | grep -n -E 'LaTeX Error|LaTeX Warning' --group-separator======================== > small.log
+        run: cat main.log | grep -n -E 'LaTeX Error|LaTeX Warning|Undefined' > small.log
+      
       - name: Upload Logs
         if: failure()
         uses: actions/upload-artifact@v2
@@ -49,7 +51,7 @@ jobs:
       - name: Print small log
         if: failure()
         shell: bash
-        run: cat small.log > &2
+        run: cat small.log >&2
         
       - name: Upload Artifacts
         if: always()
@@ -57,22 +59,17 @@ jobs:
         with:
           name: Artifacts
           path: main.pdf
-          
-      - name: Fetch tags
-        shell: bash
-        run: git fetch --tags -f
 
       - name: Deploy
+        shell: bash
         if: ${{github.ref == 'refs/heads/relese'}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git fetch --tags -f
           TAG=$(git describe --tags --exact-match HEAD)
-          hub release create -m "$(git tag -l --format='%(contents)' "$TAG")" "$TAG" || true
-          while IFS= read -r file; do
-            pdf="${file%.*}.pdf"
-            echo "Delivering file $pdf"
-            hub release edit -m '' -a "$pdf" "$TAG"
-          done <"success-list"
-        
-
+          hub release create -m "$(git tag -l --format='%(contents)' "$TAG")" "$TAG" || true   
+          for pdfs in *.pdf; do 
+            echo "\n\nDelivering file $pdfs \n\n"
+            hub release edit -m '' -a "$pdfs" "$TAG"
+          done
