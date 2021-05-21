@@ -56,6 +56,7 @@ jobs:
           path: main.pdf
           
       - name: Extract relese message if present
+        if: success()
         shell: bash
         id: relese_msg
         run: |
@@ -72,16 +73,18 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Build project
+      - name: Zip pdf file
+        if: success()
         run: |
-          zip --junk-paths my-artifact main.pdf
+          zip --junk-paths Relese main.pdf
 
       - name: Upload Release Asset
+        if: success()
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./my-artifact.zip
+          asset_path: ./Relese.zip
           asset_name: Relese.zip
           asset_content_type: application/zip
