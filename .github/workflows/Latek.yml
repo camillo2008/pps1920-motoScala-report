@@ -60,9 +60,9 @@ jobs:
 
       - name: Deploy only if tag is present
         shell: bash
-        if: ${{github.ref == 'refs/heads/relese'}}
+        if: ${{github.tag != '' && success() }}
         env:
-          GITHUB_TOKEN: ${{ github.tag != '' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch --tags -f
           TAG=$(git describe --tags --exact-match HEAD)
