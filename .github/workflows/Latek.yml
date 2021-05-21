@@ -25,7 +25,7 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: main.tex
-          #pre_compile: "tlmgr update --self --all"
+          pre_compile: "tlmgr update --self --all"
           args: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode -logfilewarninglist -Werror"
           post_compile: "latexmk -c"
       
@@ -58,7 +58,7 @@ jobs:
       - name: Check if Git tag exists
         id: check_tag
         run: echo "::set-output name=HEAD_TAG::$(git describe --tags --exact-match HEAD)"
-        #echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        #echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//} alternativa da testare?
       - name: Deploy only if tag is present
         shell: bash
         if: ${{steps.check_tag.outputs.HEAD_TAG != '' && success() }}
