@@ -80,7 +80,6 @@ jobs:
             - Second Change
           draft: false
           prerelease: false
-
       - name: Deploy only if tag is present
         shell: bash
         if: ${{steps.check_tag.outputs.HEAD_TAG != '' && success() && failure() }}
