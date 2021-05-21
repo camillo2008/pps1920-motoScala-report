@@ -56,8 +56,8 @@ jobs:
           path: main.pdf
           
       - name: Check if Git tag exists
-        run: echo "::set-env name=HEAD_TAG::$(git tag --points-at HEAD)"
-
+        run: echo "::set-output name=HEAD_TAG::$(git describe --tags --exact-match HEAD)"
+        #echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Deploy only if tag is present
         shell: bash
         if: ${{github.tag != '' && success() }}
