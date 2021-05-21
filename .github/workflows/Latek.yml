@@ -61,6 +61,7 @@ jobs:
         run: |
           echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
       - name: Create relese if tag commit contain a tag message
+        id: create_release
         if: ${{ steps.relese_msg.outputs.RELESE_NAME != '' }}
         uses: actions/create-release@v1
         env:
@@ -70,3 +71,15 @@ jobs:
           release_name: Release ${{ steps.relese_msg.outputs.RELESE_NAME }}
           draft: false
           prerelease: false
+
+
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Artifacts.zip
+          asset_name: Relese.zip
+          asset_content_type: application/zip
