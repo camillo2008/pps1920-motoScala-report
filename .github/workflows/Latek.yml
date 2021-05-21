@@ -70,12 +70,6 @@ jobs:
       - name: Test3
         shell: bash
         run: echo ${{needs.FindTagJob.steps.relese_msg.outputs.RELESE_NAME}}
-      - name: Test4
-        shell: bash
-        run: echo ${{FindTagJob.steps.relese_msg.outputs.RELESE_NAME}}
-      - name: Test5
-        shell: bash
-        run: echo ${{FindTagJob.relese_msg.outputs.RELESE_NAME}}
         
   DeployJob:
     needs: FindTagJob
