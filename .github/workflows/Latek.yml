@@ -17,13 +17,6 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Test
-        shell: bash
-        id: tes
-        run: echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
-      - name: Test1
-        shell: bash
-        run: echo ${{steps.tes.outputs.RELESE_NAME}}
       - name: Setup Git repo
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses: actions/checkout@v2
@@ -62,6 +55,12 @@ jobs:
           name: Artifacts
           path: main.pdf
           
+      - name: Extract relese message if present
+        shell: bash
+        id: relese_msg
+        run: |
+          echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
+          echo ${{ steps.tes.outputs.RELESE_NAME }}
       - name: Check if Git tag exists
         id: check_tag
         run: echo "::set-output name=HEAD_TAG::$(git describe --tags --exact-match HEAD)"
@@ -72,24 +71,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: ${{ steps.tes.outputs.RELESE_NAME }}
-          release_name: Release ${{ steps.tes.outputs.RELESE_NAME }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          tag_name: ${{ steps.relese_msg.outputs.RELESE_NAME }}
+          release_name: Release ${{ steps.relese_msg.outputs.RELESE_NAME }}
           draft: false
           prerelease: false
-      - name: Deploy only if tag is present
-        shell: bash
-        if: ${{steps.check_tag.outputs.HEAD_TAG != '' && success() && failure() }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git fetch --tags -f
-          TAG=$(git describe --tags --exact-match HEAD)
-          hub release create -m "$(git tag -l --format='%(contents)' "$TAG")" "$TAG" || true   
-          for pdfs in *.pdf; do 
-            echo "\n\nDelivering file $pdfs \n\n"
-            hub release edit -m '' -a "$pdfs" "$TAG"
-          done
