@@ -60,7 +60,6 @@ jobs:
         id: relese_msg
         run: |
           echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
-          echo ${{steps.relese_msg.outputs.RELESE_NAME}}
       - name: Create relese if tag commit contain a tag message
         if: ${{ steps.relese_msg.outputs.RELESE_NAME != '' }}
         uses: actions/create-release@v1
