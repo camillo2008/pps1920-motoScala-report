@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: Latek Build
+name: LateX Build
 on:
   push:
     branches: [ master ]
@@ -11,7 +11,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build_latek:
+  BuildLatexJob:
     # The type of runner that the job will run on
     runs-on: ubuntu-20.04
 
@@ -55,8 +55,16 @@ jobs:
           name: Artifacts
           path: main.pdf
           
+  Deploy:
+    needs: BuildLatexJob
+    if: success()
+    runs-on: ubuntu-20.04
+    steps:
+    
+      - name: Clone Repo with Checkout 
+        uses: actions/checkout@v2 # clones repo! Action implemented in this repository, tag "2"
+          
       - name: Extract relese message if present
-        if: success()
         shell: bash
         id: relese_msg
         run: |
@@ -73,10 +81,10 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Zip pdf file
-        if: success()
-        run: |
-          zip --junk-paths Relese main.pdf
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: Artifacts
 
       - name: Upload Release Asset
         if: success()
@@ -85,6 +93,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Relese.zip
-          asset_name: Relese.zip
+          asset_path: ./main.pdf
+          asset_name: main.pdf
           asset_content_type: application/zip
