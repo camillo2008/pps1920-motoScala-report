@@ -17,6 +17,8 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Test
+        run: echo ${{github.event.head_commit.message}}
       - name: Setup Git repo
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses: actions/checkout@v2
@@ -25,7 +27,7 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: main.tex
-          pre_compile: "tlmgr update --self --all"
+          #pre_compile: "tlmgr update --self --all"
           args: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode -logfilewarninglist -Werror"
           post_compile: "latexmk -c"
       
