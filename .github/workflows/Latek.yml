@@ -54,12 +54,15 @@ jobs:
         with:
           name: Artifacts
           path: main.pdf
+          
+      - name: Check if Git tag exists
+        run: echo "::set-env name=HEAD_TAG::$(git tag --points-at HEAD)"
 
-      - name: Deploy
+      - name: Deploy only if tag is present
         shell: bash
         if: ${{github.ref == 'refs/heads/relese'}}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.tag != '' }}
         run: |
           git fetch --tags -f
           TAG=$(git describe --tags --exact-match HEAD)
