@@ -3,9 +3,8 @@ name: Latek Build
 on:
   push:
     branches: [ master ]
-    tags:        
-      - '*'
-
+    tags:
+      - '**'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -18,12 +17,6 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    
-      - name: Set selected color
-        shell: bash
-        run: |
-          alias echo='echo -e'
-
       - name: Setup Git repo
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses: actions/checkout@v2
@@ -39,7 +32,7 @@ jobs:
       - name: Split log
         if: failure()
         shell: bash
-        run: cat main.log | grep -n -E 'LaTeX Error|LaTeX Warning' --group-separator======================== > small.log
+        run: cat main.log | grep -n -E 'LaTeX Error|LaTeX Warning|Undefined' > small.log
       
       - name: Upload Logs
         if: failure()
@@ -53,7 +46,7 @@ jobs:
       - name: Print small log
         if: failure()
         shell: bash
-        run: cat small.log > &2
+        run: cat small.log >&2
         
       - name: Upload Artifacts
         if: always()
@@ -61,10 +54,13 @@ jobs:
         with:
           name: Artifacts
           path: main.pdf
-
-      - name: Deploy
+          
+      - name: Check if Git tag exists
+        run: echo "::set-output name=HEAD_TAG::$(git describe --tags --exact-match HEAD)"
+        #echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Deploy only if tag is present
         shell: bash
-        if: ${{github.ref == 'refs/heads/relese'}}
+        if: ${{github.tag != '' && success() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -75,6 +71,3 @@ jobs:
             echo "\n\nDelivering file $pdfs \n\n"
             hub release edit -m '' -a "$pdfs" "$TAG"
           done
-         
-        
-
