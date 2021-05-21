@@ -2,7 +2,7 @@
 name: LateX Build
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     tags:
       - '**'
   workflow_dispatch:
