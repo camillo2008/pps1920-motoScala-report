@@ -21,7 +21,7 @@ jobs:
         id: tes
         run: echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
       - name: Test1
-        run: echo ${{steps.tes.output.RELESE_NAME}}
+        run: echo ${{steps.tes.outputs.RELESE_NAME}}
       - name: Setup Git repo
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses: actions/checkout@v2
