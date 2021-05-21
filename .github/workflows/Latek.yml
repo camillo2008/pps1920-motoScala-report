@@ -3,8 +3,7 @@ name: LateX Build
 on:
   push:
     branches: [ master ]
-    tags:
-      - '**'
+
   workflow_dispatch:
 jobs:
   BuildLatexJob:
@@ -54,10 +53,33 @@ jobs:
         id: relese_msg
         run: |
           echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
-  
+      - name: Test
+        shell: bash
+        run: echo ${{steps.relese_msg.outputs.RELESE_NAME}}
+   
+  DeployJob1:
+    needs: FindTagJob
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Test1
+        shell: bash
+        run: echo ${{needs.FindTagJob.relese_msg.outputs.RELESE_NAME}}
+      - name: Test2
+        shell: bash
+        run: echo ${{steps.relese_msg.outputs.RELESE_NAME}}
+      - name: Test3
+        shell: bash
+        run: echo ${{needs.FindTagJob.steps.relese_msg.outputs.RELESE_NAME}}
+      - name: Test4
+        shell: bash
+        run: echo ${{FindTagJob.steps.relese_msg.outputs.RELESE_NAME}}
+      - name: Test5
+        shell: bash
+        run: echo ${{FindTagJob.relese_msg.outputs.RELESE_NAME}}
+        
   DeployJob:
     needs: FindTagJob
-    if: ${{ needs.FindTagJob.relese_msg.outputs.RELESE_NAME != '' }} #if environment variable is set
+    if: ${{ needs.FindTagJob.relese_msg.outputs.RELESE_NAME != '' }}
     runs-on: ubuntu-20.04
     steps:
       - name: Clone Repo with Checkout 
