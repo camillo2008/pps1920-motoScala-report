@@ -163,32 +163,32 @@ The killer feature of `markdown-it` is very effective support of
 [syntax plugins](https://www.npmjs.org/browse/keyword/markdown-it-plugin).
 
 
-### [Emojies](https://github.com/markdown-it/markdown-it-emoji)
+### [Emojies](https://github.com)
 
 > Classic markup: :wink: :crush: :cry: :tear: :laughing: :yum:
 >
 > Shortcuts (emoticons): :-) :-( 8-) ;)
 
-see [how to change output](https://github.com/markdown-it/markdown-it-emoji#change-output) with twemoji.
+see [how to change output](https://github.com/markdown-it) with twemoji.
 
 
-### [Subscript](https://github.com/markdown-it/markdown-it-sub) / [Superscript](https://github.com/markdown-it/markdown-it-sup)
+### [Subscript](https://github.com) / [Superscript](https://github.com)
 
 - 19^th^
 - H~2~O
 
 
-### [\<ins>](https://github.com/markdown-it/markdown-it-ins)
+### [\<ins>](https://github.com)
 
 ++Inserted text++
 
 
-### [\<mark>](https://github.com/markdown-it/markdown-it-mark)
+### [\<mark>](https://github.com)
 
 ==Marked text==
 
 
-### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
+### [Footnotes](https://github.com)
 
 Footnote 1 link[^first].
 
@@ -205,7 +205,7 @@ Duplicated footnote reference[^second].
 [^second]: Footnote text.
 
 
-### [Definition lists](https://github.com/markdown-it/markdown-it-deflist)
+### [Definition lists](https://github.com)
 
 Term 1
 
@@ -230,7 +230,7 @@ Term 2
   ~ Definition 2b
 
 
-### [Abbreviations](https://github.com/markdown-it/markdown-it-abbr)
+### [Abbreviations](https://github.com)
 
 This is HTML abbreviation example.
 
@@ -238,7 +238,7 @@ It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
 
 *[HTML]: Hyper Text Markup Language
 
-### [Custom containers](https://github.com/markdown-it/markdown-it-container)
+### [Custom containers](https://github.com)
 
 ::: warning
 *here be dragons*
