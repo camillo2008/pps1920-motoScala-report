@@ -113,10 +113,11 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git fetch --all
-          git checkout docs
-          git add index.md
           git commit -m "generated"
           git status
+          git add index.md
+          git checkout docs
+          git cherry-pick master
           git push -u origin docs
 
           
