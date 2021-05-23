@@ -116,6 +116,7 @@ jobs:
           git status
           git add index.md
           git commit -m "generated"
+          git stash --include-untracked
           git checkout docs
           git cherry-pick master
           git push -u origin docs
