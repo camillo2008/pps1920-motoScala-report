@@ -119,7 +119,12 @@ jobs:
       - name: Clone Repo with Checkout 
         uses: docker://pandoc/core:2.9
         with:
-          args: "--help" # gets appended to pandoc command
+          args: >-  # allows you to break string into multiple lines
+            --standalone
+            --output=index.md
+            main.tex
+          
+
     
 
 
