@@ -113,7 +113,7 @@ jobs:
           default_author: github_actions
           add: 'index.md'
           message: 'Your commit message'
-          pull: '--rebase'
+          pull_strategy: '--rebase'
           push: '-u origin feature/view'
 
           
