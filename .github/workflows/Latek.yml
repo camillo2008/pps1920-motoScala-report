@@ -106,7 +106,7 @@ jobs:
         with:
           args: >-  # allows you to break string into multiple lines
             --standalone
-            --output=index.md
+            --output=index1.md
             main.tex        
       - name: Clone Repo with Checkout 
         run: |
@@ -115,7 +115,7 @@ jobs:
           git fetch --all
           git stash --include-untracked
           git checkout docs
-          git rm ./index.md
+          git rm ./index1.md
           git stash pop
           git add .
           git commit -m "generated"
