@@ -112,7 +112,7 @@ jobs:
         with:
           default_author: github_actions
           add: 'index.md'
-          push: "origin docs"
+          push: "origin docs --force"
 
           
 
