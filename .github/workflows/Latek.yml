@@ -115,6 +115,7 @@ jobs:
           git fetch --all
           git stash --include-untracked
           git checkout docs
+          rm index.md
           git stash pop
           git add .
           git commit -m "generated"
