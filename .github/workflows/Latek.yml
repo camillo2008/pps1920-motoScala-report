@@ -115,10 +115,10 @@ jobs:
           git fetch --all
           git status
           git add index.md
-          git commit -m "generated"
-          git stash --include-untracked
+          git stash
           git checkout docs
-          git cherry-pick master
+          git stash pop
+          git commit -m "generated"
           git push -u origin docs
 
           
