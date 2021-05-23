@@ -116,6 +116,8 @@ jobs:
     #needs: DeployJob
     runs-on: ubuntu-20.04
     steps:
+      - name: Setup Git repo
+        uses: actions/checkout@v2
       - name: Clone Repo with Checkout 
         uses: docker://pandoc/core:2.9
         with:
