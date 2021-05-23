@@ -111,5 +111,15 @@ jobs:
           asset_path: ./main.pdf
           asset_name: main.pdf
           asset_content_type: Relese pdf
+          
+  PnadocConvert:
+    #needs: DeployJob
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone Repo with Checkout 
+        uses: docker://pandoc/core:2.9
+        with:
+          args: "--help" # gets appended to pandoc command
+    
 
 
