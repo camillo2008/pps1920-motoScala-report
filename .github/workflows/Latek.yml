@@ -124,7 +124,11 @@ jobs:
           args: >-  # allows you to break string into multiple lines
             --standalone
             --output=index.md
-            main.tex
+            main.tex        
+      - uses: EndBug/add-and-commit@v7
+        with:
+          default_author: github_actions
+          add: 'index.md'
           
 
     
