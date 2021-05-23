@@ -1,0 +1,125 @@
+# This is a basic workflow to help you get started wFith Actions
+name: LateX Build
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+jobs:
+  BuildLatexJob:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Setup Git repo
+        uses: actions/checkout@v2
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: main.tex
+          #pre_compile: "tlmgr update --self --all"
+          args: "-pdf -file-line-error -halt-on-error -interaction=nonstopmode -logfilewarninglist -Werror"
+          post_compile: "latexmk -c"
+      - name: Split log
+        if: failure()
+        shell: bash
+        run: cat main.log | grep -n -E 'LaTeX Error|LaTeX Warning|Undefined' > small.log
+      - name: Upload Logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Logs
+          path: |
+            main.log
+            small.log 
+      - name: Print small log
+        if: failure()
+        shell: bash
+        run: cat small.log >&2
+      - name: Upload Artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Artifacts
+          path: main.pdf
+            
+  FindTagJob:
+    needs: BuildLatexJob
+    if: success()
+    runs-on: ubuntu-20.04
+    # Map a step output to a job output
+    outputs:
+      output1: ${{ steps.relese_msg.outputs.RELESE_NAME }}
+    steps:
+      - name: Clone Repo with Checkout 
+        uses: actions/checkout@v2 # clones repo! Action implemented in this repository, tag "2"
+      - name: Extract relese message if present
+        shell: bash
+        id: relese_msg
+        run: |
+          echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
+          
+  DeployJob:
+    needs: FindTagJob
+    if: ${{ needs.FindTagJob.outputs.output1 != '' }} #if environment variable is set
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone Repo with Checkout 
+        uses: actions/checkout@v2 # clones repo! Action implemented in this repository, tag "2"
+      - name: Extract relese message if present
+        shell: bash
+        id: relese_msg
+        run: |
+          echo "::set-output name=RELESE_NAME::$(echo ${{github.event.head_commit.message}} | grep -o -P '(?<=-TAG{).*(?=})')"
+      - name: Create relese if tag commit contain a tag message
+        id: create_release
+        if: ${{ steps.relese_msg.outputs.RELESE_NAME != '' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{ steps.relese_msg.outputs.RELESE_NAME }}
+          release_name: Release ${{ steps.relese_msg.outputs.RELESE_NAME }}
+          draft: false
+          prerelease: false
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: Artifacts
+      - name: Upload Release Asset
+        if: success()
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./main.pdf
+          asset_name: main.pdf
+          asset_content_type: Relese pdf
+          
+  PnadocConvert:
+    #needs: DeployJob
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Setup Git repo
+        uses: actions/checkout@v2
+      - name: Clone Repo with Checkout 
+        uses: docker://pandoc/core:2.9
+        with:
+          args: >-  # allows you to break string into multiple lines
+            --standalone
+            --output=index.md
+            main.tex        
+      - name: Clone Repo with Checkout 
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git fetch --all
+          git add index.md
+          git commit -m "generated"
+          git status
+          git push -f origin master:docs
+
+          
+
+    
+
+
