@@ -95,7 +95,7 @@ jobs:
           asset_name: main.pdf
           asset_content_type: Relese pdf
           
-  PnadocConvert:
+  PandocConverter:
     #needs: DeployJob
     runs-on: ubuntu-20.04
     steps:
