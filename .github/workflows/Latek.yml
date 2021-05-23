@@ -112,6 +112,7 @@ jobs:
         with:
           default_author: github_actions
           add: 'index.md'
+          message: 'Your commit message'
           push: -u origin feature/view --force
 
           
