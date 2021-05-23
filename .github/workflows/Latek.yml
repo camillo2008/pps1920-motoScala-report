@@ -113,13 +113,14 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git fetch --all
+          git add ./index.md
+          git commit -m "Generated new index.md"
           git stash --include-untracked
           git checkout docs
           git rm ./index.md
-          git stash pop
-          git add .
-          git commit -m "generated"
-          git push
+          git commit -m "Removed old index.md"
+          git cherry-pick master
+          git push 
 
           
 
