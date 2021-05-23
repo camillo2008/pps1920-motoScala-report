@@ -116,7 +116,7 @@ jobs:
           git add index.md
           git commit -m "generated"
           git status
-          git push -u origin master:docs
+          git push -f origin master:docs
 
           
 
