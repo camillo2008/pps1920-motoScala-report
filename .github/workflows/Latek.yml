@@ -106,7 +106,7 @@ jobs:
         with:
           args: >-  # allows you to break string into multiple lines
             --standalone
-            --output=index1.md
+            --output=index.md
             main.tex        
       - name: Clone Repo with Checkout 
         run: |
