@@ -1,0 +1,255 @@
+% -*- root: ../../main.tex -*-
+\section{Luca Giulianini}
+Lo studente Luca Giulianini si è occupato della \textbf{progettazione} e \textbf{implementazione} delle seguenti macro-parti:
+\begin{itemize}
+	\item \hyperref[subsec:arc_mediator]{\textbf{Architettura generale e mediazione MVC-ECS}}
+	\item \hyperref[subsec:arc_ecs]{\textbf{Architettura ECS}}
+	\item \hyperref[subsec:arc_view]{\textbf{Framework View}}
+	\item \hyperref[subsec:game_screen]{\textbf{Schermata di Gioco}}
+	\item \hyperref[subsec:ci]{\textbf{Continuous Integration e configurazione dei Build-Tools}}
+\end{itemize}
+ha contribuito alla \textbf{progettazione} di:
+\begin{itemize}
+	\item \hyperref[subsec:media_event]{\textbf{Sound Agent - design basato su Handlers}}
+\end{itemize}
+inoltre ha contribuito al lavoro dei colleghi svolgendo una serie di \textbf{task implementativi}:
+\begin{itemize}
+	\item \hyperref[subsubsec:input_sys]{\textbf{Input System}}
+	\item \hyperref[subsubsec:damage]{\textbf{Life points e collision damage}}
+	\item \hyperref[subsubsec:monix_sys]{\textbf{Monix - Parallelizzazione update dei sistemi}}
+\end{itemize}
+
+\subsubsection{Approfondimenti}
+Parallelamente all'esperienza di progetto sono stati approfonditi una serie di argomenti relativi al mondo di \textbf{Scala} e della \textbf{programmazione funzionale}. 
+\begin{itemize}
+	\item{\textbf{Teoria delle Categorie:}} sono stati chiarite le principali astrazioni funzionali provenienti dalla teoria delle categorie. La libreria \texttt{cats} in questo senso fornisce ottime astrazioni per il concetto di \texttt{Semigroup, Monoid, Functor, Monad} (vedi \ref{subsubsec:risorse}).
+	\item{\textbf{Pogrammazione funzionale:}} sono stati approfonditi gli aspetti teorici (\textbf{referential transparency, effects, ecc}) ed è stato appreso un insieme di \textbf{buone pratiche} relative alla programmazione funzionale. Questo è stato fatto seguento svariate \textbf{conferenze} dedicate al mondo Scala e appoggiandosi a una serie di \textbf{libri} dedicati. 
+	\item{\textbf{Refined Types:}} Molto utili nella fase di \textbf{validazione statica e dinamica} di input. Attualmente non utilizzati data la natura del progetto in questione.
+	\item{\textbf{Monix:}} È stato approfondito il mondo della programmazione \textbf{reattiva} focalizzandosi maggiormente sul framework \texttt{Monix}.
+\end{itemize}
+
+\subsection{Architettura generale e mediazione MVC-ECS}
+\label{subsec:arc_mediator}
+\subsubsection{Progettazione}
+La definizione di una architettura generale ha richiesto un grande sforzo dal punto di vista del \textbf{design}. I principali problemi da risolvere sono stati essenzialmente i seguenti:
+\begin{itemize}
+	\item{\textbf{Interazione MVC-ECS:}} il problema in questo caso risiede nella \textbf{natura architetturale} dei due \textbf{pattern}. Essi generalmente sono utilizzati \textbf{singolarmente} per plasmare una applicazione e una possibile \textbf{integrazione} con altri pattern avrebbe potuto portare a \textbf{seri conflitti}.
+	\item{\textbf{Estendibilità al modello client-server:}} l'idea architetturale fondante, per quanto riguarda l'intero applicativo, è sempre stata diretta verso la definizione di un \textbf{core funzionante} espandibile attraverso \textbf{moduli client-server} (attori). L'idea è stata sicuramente ambiziosa ma ha portato con se una serie di problemantiche non banali a livello interazionale. Infatti, sviluppare un \textbf{core} \textbf{modulare} e \textbf{dinamico} in base alla tipologia di interazione richiede un alto tasso di ingegnerizzazione e \textbf{anticipazione del cambiamento}.
+\end{itemize}
+\paragraph{La Soluzione}
+La soluzione come già anticipato in \ref{sec:mediator_design} è consistita nella defini-zione di un oggetto di tipo \texttt{publish/subscribe} (il \texttt{Mediator}) capace di \textbf{mediare i flussi di dati} fra un numero di oggetti indefinito.
+
+\subsubsection{Implementazione}
+\paragraph{Approccio ad Handlers}
+\label{subsubsec:mediator_handler_problem}
+L'implementazione del \texttt{Mediator} è stata inizialmente incentrata su una architettura basata su \textbf{handlers} ad \textbf{eventi} (vedi \ref{fig:mediatorHandler}). L'architettura però ha da subito presentato alcune \textbf{lacune} molto gravi fra le quali troviamo l'impossibilità di poter \textbf{rimuovere facilmente handlers relativi a un subscriber} e una \textbf{più difficile gestione delle gerarchie di eventi}. Per questo motivo si è deciso di sacrificare un briciolo di performance e puntare maggiormente su una architettura più \textbf{pulita} e \textbf{stabile} basata su \textbf{Observers}.
+
+\paragraph{Approccio ad Observers}
+Questo approccio si basa essenzialmente sul modello proposto dal \textbf{Pattern Observer}. Nel caso proposto però la parte\\ { }\texttt{Observable} è stata incapsulata all'interno di un unico elemento, il \texttt{Mediator}. Così facendo il \texttt{Mediator} si configura come \textbf{unico punto di snodo} capace di \textbf{osservare} e \textbf{ridirigere} gli eventi verso l'\texttt{Observer} \textbf{appropriato} (\textbf{Subscriber}). La ridirezione è svolta osservando il \textbf{tipo dell'evento} in \textbf{entrata} e il tipo dell'evento al quale un \texttt{Observer} \textbf{è interessato}. Ogni \texttt{Observer} è interessato a tutti gli eventi che sono \textbf{covarianti} rispetto al tipo di evento al quale si sono \textbf{sottoscritti} (vedi \ref{lst:listato1})
+
+\lstinputlisting[caption={Mediator}, label=lst:listato1]{code/Giulianini/Mediator.scala}
+
+Per quanto riguarda la definizione degli eventi, si è deciso di utilizzare un approccio basato su \texttt{Algebraic Data Type} grazie al quale è possibile definire una gerarchia di eventi (vedi \ref{lst:listato2})
+
+\lstinputlisting[caption={Event}, label=lst:listato2]{code/Giulianini/Event.scala}
+
+\subsubsection{Contributi e validazioni}
+\begin{itemize}
+	\item{\textbf{Gyordan Caminati:}} l'implementazione del \texttt{Mediator} tramite l'utilizzo di \texttt{Observers} è stata \textbf{validata} da Gyordan Caminati. Inoltre Gyordan ha fornito un \textbf{contributo} molto importante nella \textbf{risoluzione di un problema} riscontrato durante l'utilizzo di \textbf{reflections} in Scala. 
+\end{itemize}
+
+
+\subsection{Architettura ECS}
+\label{subsec:arc_ecs}
+\subsubsection{Progettazione}
+La fase di progettazione relativa ad ECS è consistita in un \textbf{processo di continuo raffinamento}, iniziato prendendo spunto da alcuni \textbf{articoli proposti in rete} e concluso con una \textbf{soluzione} estremamente \textbf{pulita} e \textbf{concisa}. 
+
+\paragraph{Composition over Inheritance}
+Personalmente la sfida più grande in questo caso è stata trovare un design che permettesse di ottenere una \textbf{buona estendibilità} mantenendo allo stesso tempo delle \textbf{buone performance}. Si è passati così alla definizione di un modello \textbf{data-driven}, molto vicino ad una \textbf{visione funzionale}. Come vediamo in \ref{fig:ECS} si è deciso di spostare l'intera architettura verso un approccio basato su \textbf{composizione}, molto \textbf{estendibile} e \textbf{manutenibile}. 
+
+\paragraph{Managers}
+L'intera \textbf{logica di gestione} è stata spostata \textbf{al di fuori} delle entità in gioco, all'interno di moduli dedicati chiamati \texttt{Manager}. Ogni manager è caratterizzato da un \textbf{insieme ridotto di operazioni} dedicate a \textbf{gestire} e \textbf{connettere} al più due \textbf{tipologie} di oggetti. Per esempio un \texttt{ComponentManager} è in grado di gestire solamente \texttt{Component} e per farlo mette in relazione ad essi anche delle \texttt{Entity}.
+
+\paragraph{Coordinator}
+Poichè la gestione di singoli \texttt{Manager} separatamente produrrebbe un \textbf{design frammentato} e difficilmente controllabile, è stato deciso di \textbf{coordinare} quest'ultimi grazie ad un unico modulo che prende il nome appunto di\\ \texttt{Coordinator}.
+
+\subsubsection{Implementazione}
+L'implementazione dell'architettura di \texttt{ECS} è risultata estramente \textbf{lineare} e \textbf{non si è discostata} di molto da ciò che era stato \textbf{progettato}.
+
+\subsubsection{Contributi e validazioni}
+\begin{itemize}
+	\item{\textbf{Ruben Ceroni:}} l'implementazione dell'architettura di \texttt{ECS} è stata \textbf{validata} da Ruben Ceroni il quale ha \textbf{incoraggiato} verso lo sviluppo di una \textbf{soluzione} basata su \textbf{managers}.
+\end{itemize}
+
+\subsection{Framework View}
+\label{subsec:arc_view}
+Le interfacce grafiche sono generalmente formate da più schermate che rappresentano \textbf{moduli di interazione} utente-applicativo. Una delle sfide più grandi che si devono affrontare nel momento in cui si sviluppa un'interfaccia grafica è la definizione di un \textbf{framework} capace di gestire al meglio questi moduli. 
+
+\subsubsection{Progettazione}
+\paragraph{Problemi}
+Il framework proposto si pone come obiettivo la risoluzione di due problemi fondamentali:
+\begin{itemize}
+ 	\item{\textbf{Gestione e cambio di schermate:}} come introdotto precedentemente, dovrà essere possibile gestire in modo \textbf{dinamico} le schermate garantendo proprietà di \textbf{scalabilità} nel \textbf{numero} delle stesse. Inoltre si dovrà definire un modo per garantire un \textbf{controllo} nel \textbf{cambio di schermata}.
+ 	\item{\textbf{Interazione View-Controller:}} l'interazione fra \texttt{View} e \texttt{Controller} \\deve essere definita in modo \textbf{pulito} ed \textbf{efficace}. Lo scopo sarà quello di evitare la generazione di \textbf{God-Class} costituite da una moltitudine di \textbf{metodi} dedicati alle singole schermate.
+ \end{itemize}
+\paragraph{Soluzioni}
+La soluzione proposte sono le seguenti:
+\begin{itemize}
+ 	\item{\textbf{Gestione e cambio di schermata:}} in questo caso la soluzione si basa sull' uso di un pattern molto utilizzato nel contesto delle GUI, il \texttt{Pattern Façade}. Il façade garantisce una \textbf{facciata di interazione} a tutte le sotto-schermate espondendo ad esse alcuni \textbf{comandi fondamentali}. In questo modo ogni sotto-schermata può chiedere al façade di essere \textbf{sostituita} o può chiedere il \textbf{caricamento} di una ulteriore schermata. 
+ 	\item{\textbf{Interazione View-Controller:}} L'interazione fra \texttt{View} e \texttt{Controller} è spesso regolamentata all'interno di MVC tramite il \texttt{Pattern Observer} basato sul \textbf{Interface Segregation Principle}. Secondo questa forma di Observer, \texttt{View} e  \texttt{Controller} possiedono \textbf{reciprocamente una sotto-interfaccia} e tramite essa possono invocare metodi in modo sicuro.
+
+ 	Un problema che emerge dall'utilizzo di questo pattern risiede nel fatto che una \textbf{aggiunta} continua di \textbf{funzionalità} a queste sotto-interfacce potrebbe portare nel tempo a un'\textbf{esplosione} della dimensione due moduli (God-Class).
+
+ 	Al fine di evitare ciò si è deciso di utilizzare una versione più scalabile del Pattern Observer basata su \textbf{eventi}.
+ \end{itemize}
+
+\subsubsection{Implementazione}
+\paragraph{Gestione delle schermate}
+La gestione delle schermate è stata delegata ad un modulo a parte chiamato \texttt{ScreenLoader}. Questo modulo è molto semplice e consiste, come vediamo nello snippet \ref{lst:listato3}, nella definizione di una \textbf{cache} dedicata alla gestione delle schermate.
+
+\texttt{ScreenLoader} mette a disposizione una serie di funzionalità di \textbf{caricamento di schermate} e \textbf{gestione dei controller} relativi. Il modulo permette inoltre di poter \textbf{applicare una schermata ad un nodo} abilitando così il \textbf{cambio di schermata}.
+
+\lstinputlisting[caption={ScreenLoader}, label=lst:listato3]{code/Giulianini/ScreenLoader.scala}
+
+\paragraph{Logica di cambio di schermata}
+La \textbf{logica} del cambio di schermata deve essere \textbf{separata} dalle singole schermate in modo che esse \textbf{non debbano proccuparsi} di dove ridirigere l'utente.
+
+Seguento il principio di \textbf{Separation of Concept} si è deciso di delegare il cambio di schermata a una \textbf{Macchina a Stati Finiti} (\texttt{FSM}). Così facendo è possibile definire in modo dichiarativo una serie di coppie (\texttt{Event} \texttt{->} \texttt{State}) che costituiscono le \texttt{transizioni} della nostra \texttt{FSM}. Ovviamente, dato il contesto, definiremo uno \texttt{State} come \texttt{Screen}: ossia ogni stato sarà caratterizzato dalla schermata che sta mostrando (vedi \ref{lst:listato4}).
+
+\lstinputlisting[caption={View e StateMachine}, label=lst:listato4]{code/Giulianini/View.scala}
+
+\paragraph{Interazione View-Controller}
+L'interazione tra \texttt{View} e \texttt{Controller} è stata implementata, come abbiamo già anticipato, sfruttando i pattern Observer ba-sato su Eventi. Al fine limitare una possibile esplosione di eventi si è deciso di sfruttare una struttura ad \texttt{Algebraic Data Type} \textbf{gerarchica}.
+
+Si è deciso di creare una \textbf{famiglia di eventi} per ogni schermata definendo un \textbf{trait dedicato}. Così facendo il façade si trova a gestire solamente \textbf{un tipo di evento per schermata} delegando la gestione dell'\textbf{evento concreto} (sotto-tipo) alla schermata corrispondente.Questo approccio basato su \textbf{deleghe}, permette di ottenere un'\textbf{implementazione pulita} ed \textbf{estendibile} (vedi \ref{lst:listato5}).
+
+\lstinputlisting[caption={Observer[Event]}, label=lst:listato5]{code/Giulianini/ObserverEvent.scala}
+
+\subsubsection{Contributi e validazioni}
+\begin{itemize}
+	\item{\textbf{Gyordan Caminati:}} l'implementazione del framework proposto è stata \textbf{validata} da Gyordan Caminati. Gyordan ha contribuito inoltre a fornire un \textbf{input} per un'idea di \textbf{interazione ad eventi}, sopra alla quale poi è stata sviluppata l'implementazione finale.
+\end{itemize}
+
+\subsection{Schermata di Gioco}
+\label{subsec:game_screen}
+Come introdotto precedentemente in \ref{sec:mediator_design} lo scopo di \texttt{Mediator} consiste nel creare un collegamento \textbf{lasco} fra \texttt{GameScreen} e \texttt{Engine/ClientActor}. La schermata di gioco si configura quindi come punto di incontro fra pattern \texttt{ECS} e \texttt{MVC}; di conseguenza è molto importante saper suddividere le varie \textbf{responsabilità}. Come vediamo in \ref{lst:listato6} la separazione dei concetti è molto forte ed è dettata dall'implementazione di due interfacce separate:
+\begin{itemize}
+	\item{\texttt{Displayable:}} gestisce gli eventi provenienti da \texttt{Mediator}. Ovviamente questi sono inoltrati solamente previa \textbf{sottoscrizione} al \texttt{Mediator} che è così in grado di associare alla schermata di gioco l'insieme di eventi compatibili (subtype di \texttt{Displayable}).
+	\item{\texttt{ScreenController:}} abstract root class che fornisce un metodo \texttt{notify} che veicola tutti i messaggi che giungono al \texttt{View-Façade}. Ogni schermata implementa una gestione dedicata ai soli \textbf{propri messaggi}.
+\end{itemize}
+\texttt{GameScreen} dovrebbe idealmente rappresentare una schermata utile solo in \textbf{fase di gioco}, di conseguenza ci si auspica che la gestione di eventi provenienti da \texttt{Controller} sia ridotta al minimo.
+
+\lstinputlisting[caption={ScreenControllerGame}, label=lst:listato6]{code/Giulianini/ScreenControllerGame.scala}
+
+\subsubsection{Eventi di gioco}
+La gestione del gamplay è modellata su questi eventi:
+\begin{itemize}
+	\item{\textbf{LevelSetup:}} inviato nel momento in fase di caricamento di un livello: esso è responsabile della creazione e inizializzazione delle logiche di \textbf{comando} e \textbf{visualizzazione}.
+	\item{\textbf{DrawEntities:}} evento di \textbf{visualizzazione} contenente le entità da \textbf{disegnare}.
+	\item{\textbf{EntityLife:}} evento di \textbf{gioco} che contiene il \textbf{danno inferto} all'entità governata dall'utente.
+	\item{\textbf{LevelEnd:}} evento utilizzato per \textbf{dismettere} le strutture dati create per gestire il gamplay.
+\end{itemize}
+
+\subsubsection{Implementazione gameplay}
+La gestione del vero e proprio gameplay è stata nascosta in una classe astratta chiamata \texttt{AbstractScreenControllerGame}. La suddivisione è stata proposta per garantire una maggiore pulizia e definire una \textbf{separazione} fra interazione e operazioni interne che verranno appunto gestite da questa classe. La gestione del gameplay si focalizza su due operazioni fondamentali:
+\begin{itemize}
+	\item{\textbf{Elaborazione e invio di comandi}}
+	\item{\textbf{Visualizzazione delle entità}}
+\end{itemize}
+
+\paragraph{Elaborazione e invio di comandi}
+L'elaborazione di comandi è un'opera-zione molto delicata poiché si basa sull'\textbf{acquisizione} real-time dell'input dell'u-tente. In questo frangente la libreria \texttt{JavaFx} si è rivelata molto utile poiché permette di ottenere, tramite \texttt{handlers}, un \textbf{flusso continuo} di eventi da \textbf{qualsiasi nodo} della schermata.
+
+Dato che l'acquisizione non deve essere costante ma solo dedicata alla \textbf{fase di gioco}, si è deciso di \textbf{racchiudere} la logica di gestione ed elaborazione dell'input in un \textbf{modulo immutabile}, \texttt{GameEventHandler} (vedi \ref{lst:listato7}).
+
+\lstinputlisting[caption={GameEventHandler}, label=lst:listato7]{code/Giulianini/GameEventHandler.scala}
+
+Il funzionamento del modulo è molto semplice: esso infatti rispecchia le fasi di \textit{setup} (\texttt{LevelSetupEvent}) e \textit{teardown} (\texttt{LevelEndEvent}) elencate precedentemente con una modalità operativa che questa volta è dedicata all'\textit{invio di comandi} piuttosto che alla visualizzazione di entità.
+\begin{itemize}
+	\item{\textbf{Setup:}} in fase di setup vengono \textbf{inizializzati} e \textbf{agganciati} gli handler utili per la generazione di eventi. Inoltre viene fornito l'\textbf{uuid} del player, utile per marcare i messaggi inviati.
+	\item{\textbf{Teardown:}} una volta completato il gameplay potranno essere \textbf{sganciati} gli \textbf{handler}.
+\end{itemize}
+
+\subparagraph{Invio di CommandEvent}
+La gestione dell'invio di comandi si svolge in questo modo:
+Quando l'utente preme un testo il sistema in tempo reale invoca l'handler dedicato il quale restituirà un evento contente il \textbf{codice} del pulsante premuto. Il codice, opportunamente convertito in \texttt{Direction} viene aggiunto a un set che mantiene le \textbf{direzioni attualmente attive} e dopo aver calcolato la \textbf{direzione risultate} essa viene inviata sotto forma di \texttt{CommandEvent} all'\texttt{Engine}.
+
+\paragraph{Visualizzazione delle entità}
+Dato che la visualizzazione di entità è strettamente legata alla tipologia delle stesse si è deciso di racchiudere la logica di disegno all'interno di particolari oggetti chiamati \texttt{EntityWrapper}. Ogni wrapper possiede un'immagine specifica per ogni entità e contiene inoltre un metodo \texttt{draw} che ne definisce la visualizzazione.
+
+\subsection{Continuous Integration e configurazione dei Build-Tools}
+\label{subsec:ci}
+Data la buona esperienza accumulata nell'ambito della \texttt{CI} l'implementazione della stessa è stata svolta interamente dallo studente. In questo caso si è deciso di sperimentare un processo di \textbf{rilascio} basanto interamente su \texttt{GitHub}. Per fare ciò ci è affidati ai servizi \texttt{Releases} e \texttt{Pages} messi a disposizione dalla piattaforma. Un'altra sperimentazione ha portato a definire un processo di deploy dedicato ai file \texttt{.tex}, il quale permetteva di \textbf{compilare remotamente} la relazione per poi \textbf{inviarla} ai colleghi in modo automatico.
+
+\subsection{Sound Agent - design basato su Handlers}
+\label{subsec:media_event}
+\subsubsection{Progettazione}
+Rifacendosi alla grande intuizione di Gyordan nel dotare il \texttt{SoundAgent} di un \textbf{thread di elaborazione separato}, si è colta l'opportunità di migliorare ancora di più il design aggiungendo una \textbf{gestione ad eventi}. È stato poi definito un tipo di evento standard, \texttt{MediaEvent} il quale fornisce un unico metodo \texttt{handle} che opera su un \texttt{SoundEventLogic} (vedi \ref{lst:listato8}).
+
+\lstinputlisting[caption={MediaEvent e Integrazione in SoundAgent}, label=lst:listato8]{code/Giulianini/MediaEvent.scala}
+
+Un \texttt{MediaEvent} si configura quindi come un \textbf{handler}, ossia un contenitore di codice che potrà essere eseguito su un qualsiasi oggetto che implementi \texttt{SoundAgentLogic}. L'integrazione di \texttt{MediaEvent} e \texttt{SoundAgent} ha portato alla definizione di un \textbf{event loop} capace di eseguire eventi che hanno come target lo stesso \texttt{SoundAgent}:
+\begin{verbatim}
+case Success(ev) => ev.handle(this)
+\end{verbatim}
+
+\subsection{Altri Task}
+\subsubsection{Input System}
+\label{subsubsec:input_sys}
+L'\texttt{InputSystem} è il sistema dedicato all'elaborazione dell'input dell'utente il cui scopo principe è quello di fornire una \textbf{direzione} alle entità di gioco. In questo caso la soluzione ottima è stata ottenuta andando a \textbf{completare} quella proposta dal lato \texttt{View}.
+
+I comandi precedentemente accodati vengono estratti dalla coda, \textbf{filtrati} in base all'\textbf{entità corrispondente} e infine mappati in \textbf{direzioni}. Poiché le direzioni contenute nei comandi seguono un \textbf{ordine cronologico}, sarà necessario mantenere solamente l'\textbf{ultima direzione} disponibile scartando tutte le altre \footnote{Questo avviene solamente quando la frequenza di invio dei comandi supera la frequenza di aggiornamento di gioco.}.
+
+\subsubsection{Life points e collision damage}
+\label{subsubsec:damage}
+Data la grande \textbf{flessibilità} di ECS è stato molto facile introdurre il concetto di \textbf{danno a fronte di collisioni}. L'implementazione consiste di due parametri all'interno del \texttt{CollisionComponent}: \textbf{vita} (\texttt{life}) e \textbf{danno} (\texttt{damage}). Nel momento in cui viene rilevata una \textbf{collisione} i \textbf{life points} dell'utente vengono \textbf{decrementati} in base al danno indicato sulla medesima entità.
+
+L'implementazione è stata \textbf{decisamente migliorata} da \textbf{Sara Kiade} che ha aggiunto \textbf{nuove dinamiche} irrobustendo contemporaneamente quelle già proposte.
+
+\paragraph{Interazione con View:}
+Al fine di \textbf{comunicare} i vari punti vita alle varie \textbf{interfacce grafiche} è stato predisposto un \textbf{messaggio di mediazione} dedicato: \texttt{EntityLifeEvent}. Nel momento della ricezione del messaggio, lato view, è stata creata una \textbf{barra di caricamento} che viene mano a mano decrementata a seconda del \textbf{danno inferto}.
+
+\subsubsection{Monix - Parallelizzazione update dei sistemi}
+\label{subsubsec:monix_sys}
+Uno dei problemi di ECS risiede nella sua natura \textbf{poco parallelizzabile}. Al fine di mantenere la \textbf{consistenza} fra le varie entità, infatti, il framework richiede che l'\textbf{aggiornamento di gioco} venga svolto \textbf{in maniera sequenziale} invocando il metodo \texttt{update()} su ogni sistema. Relativamente all'implementazione del metodo \texttt{update()}, invece, non vi sono restrizioni particolari e ciò garantisce \textbf{ampio margine per ottimizzazioni}.
+
+L'ottimizzazione proposta si basa sul reactive-framework \texttt{Monix} e consiste essenzialmente nel \textbf{eseguire le operazioni sulle entità} (collisioni) in modo \textbf{parallelo} splittando il Set in base al numero di core disponibili.
+
+\subsection{Risorse}
+\label{subsubsec:risorse}
+Gli approfondimenti sono stati svolti grazie all'utilizzo delle seguenti risorse:
+\begin{itemize}
+	\item{\textbf{Libri:}}
+	\begin{itemize}
+		\item{\textbf{Learning Scala \cite{scalaLearning:2014}:}} libro che riassume interamente le \textbf{principali features} del linguaggio Scala in ambito \textbf{funzionale}. È stato usato per consolidare alcune conoscenze pregresse.
+		\item{\textbf{Programming in Scala \cite{scalaBook:2014}:}} rappresenta la bibbia di Scala ed è stato scritto dal grandissimo \textbf{Martin Odersky}.
+		\item{\textbf{Scala with Cats \cite{scalaCats:2020}:}} libro che copre gli aspetti più \textbf{avanzati} del linguaggio Scala dal punto di vista \textbf{funzionale}. Per ogni singolo aspetto è fornita una \textbf{definizione teorica} e la relativa implementazione nella libreria ufficiale \href{https://typelevel.org/cats-effect/}{\texttt{Cats}}. È un libro particolarmente \textbf{complesso} ed è stato utilizzato come approfondimento.
+		\item{\textbf{Scala Cookbook \cite{scalaCook:2013}:}} I \textbf{Cookbook} di O'Reilly sono conosciuti per essere estremamente \textbf{pragmatici}. Anche in questo caso il libro si configura come un'\textbf{enciclopedia del problem solving} dedicata interamente al linguaggio Scala.
+		\item{\textbf{Functional Programming in Scala \cite{functionalScala:2014}:}} davvero una grande scoperta. Questo libro rappresenta un insieme di \textbf{buone pratiche} e \textbf{aspetti teorici} che ogni programmatore Scala dovrebbe conoscere. Personalmente di grande utilità sono stati i capitoli che trattano la \textbf{gestione degli errori} e gli aspetti funzionali più avanzati (\texttt{monoids, monads} e \texttt{applicative functors}).  
+	\end{itemize}
+	\item{\textbf{Conferenze:}}
+	\begin{itemize}
+		\item{\textbf{Scala Days:}}
+		Sono le conferenze ufficiali di Scala che ogni anno hanno luogo in un paese diverso. I talk proposti sono estremamente interessanti e permettono di apprendere un gran numero di \textbf{tecniche avanzate} e sopratutto costituiscono un ottimo esempio di \textbf{buona programmazione}.
+		Conferenze consigliate:
+		\begin{itemize}
+			\item{\emph{\href{https://www.youtube.com/watch?v=30q6BkBv5MY}{Functional Programming with Effects by Rob Norris}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=DGa58FfiMqc}{Scala best practices I wish someone'd told me about - Nicolas Rinaudo}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=pHHKUKubs1Q&t=2002s}{Migrating to Scala 2.13 by Julien Richard Foy and Stefan Zeiger}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=CrpJJYPzdJE&t=630s}{Akka Streams to the Extreme - Heiko Seeberger}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=TqJg4AuxEIQ}{Concurrent programming in 2019: Akka, Monix or ZIO? - Adam Warski}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=wfbF5jQiAhQ}{Security with Scala Refined Types and Object Capabilities by Will Sargent}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=_Rnrx2lo9cw}{A Tour of Scala 3 - Martin Odersky}}}
+		 \end{itemize} 
+		\item{\textbf{Scalapeño:}} come dice il nome stesso, sono \textbf{conferenze piccanti} che hanno lo scopo di smuovere le acque all'interno della comunità di Scala.
+		Conferenze consigliate:
+		\begin{itemize}
+			\item{\emph{\href{https://www.youtube.com/watch?v=v8IQ-X2HkGE}{The Last Hope for Scala's Infinity War - John A. De Goes}}}
+			\item{\emph{\href{https://www.youtube.com/watch?v=Arwb6DSrWXE&t=102s}{Scala vs. Kotlin, friend or foe? - Ohad Shai}}}
+		 \end{itemize}
+		 \item{\textbf{Altre conferenze:}}
+		 \begin{itemize}
+		 	\item{\emph{\href{https://www.youtube.com/watch?v=71yhnTGw0hY&feature=youtu.be}{John De Goes - 12 Steps To Better Scala (Part I)}}}
+		 \end{itemize}
+	\end{itemize}
+\end{itemize}

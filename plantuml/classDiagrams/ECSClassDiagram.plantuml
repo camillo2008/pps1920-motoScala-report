@@ -1,0 +1,57 @@
+@startuml ECSClassDiagram
+
+scale 1
+
+class "Entity"  as EntityClass <<Product Type>> {
+    - ID : Int
+    - components : Map<ComponentType, 
+    Component>
+}
+
+enum ComponentType {
+    DIRECTION,
+    POSITION,
+    SPEED,
+    SPAWN,
+    ...
+}
+
+class "Component" as ComponentClass <<Product Type>> {
+    - type: ComponentType
+}
+
+interface Observer {
+    + notify(event: ManagerEvent)
+}
+
+class System {
+    - managedTypes: List<ComponentType>
+    - filteredEntities: List<Entity>
+
+    + addEntityRef(): Unit
+    + removeEntityRef(): Unit
+    + update(): Unit
+    - checkEntityISCompatible(): Unit
+}
+
+
+class EntityManager{
+    - entities: List<Entity>
+    - systems: Set<Observer>
+    
+    + subscribe(system: Observer)
+    + addEntity(entity: Entity)
+    + removeEntity(id: Int)
+    - notifySystems(event: ManagerEvent)
+}
+
+note right of EntityClass: Module + Case Class
+
+System -up-|> Observer
+EntityManager o-left- "0..*" Observer : "                   "
+EntityManager "1" *-down- "0..*" EntityClass
+System "0..*" o-right- "0..*" EntityClass: "            "
+EntityClass"1" *-down- "0..*" ComponentClass
+System "1..*" *-down- ComponentType
+ComponentClass "1" *-left- ComponentType: "                                    "
+@enduml
