@@ -102,7 +102,7 @@ jobs:
       - name: Setup Git repo
         uses: actions/checkout@v2
       - name: Clone Repo with Checkout 
-        uses: docker://pandoc/latex:2.9
+        uses: docker://pandoc/latex:2.9.0
         with:
           args: >-  # allows you to break string into multiple lines
             --standalone
