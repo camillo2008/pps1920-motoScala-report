@@ -139,14 +139,14 @@ jobs:
             -o ./index.html
             main.tex
             
-      - name: Clone Repo with Checkout 
+      - name: Commit the new gh-pages html
         run: |
-          git add ./index.md
-          git commit -m "Generated new index.md"
-          git stash --include-untracked
+          git add ./index.html
+          git commit -m "Generated new index.html"
+          git clean -f -d
           git checkout docs
-          git rm ./index.md
-          git commit -m "Removed old index.md"
+          git rm ./index.html
+          git commit -m "Removed old index.html"
           git cherry-pick master
           git push
     
