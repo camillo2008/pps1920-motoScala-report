@@ -154,6 +154,8 @@ jobs:
           git commit -m "Removed old pandoc dependency"
           git cherry-pick master
           git push
+          git cherry-pick master
+          git push
     
 
 
