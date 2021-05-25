@@ -110,7 +110,7 @@ jobs:
           
       - name: Clone Pandoc dependency 
         run: |
-          git clone git@github.com:SmartDogHouse/pandoc-uikit.git
+          git clone https://github.com/SmartDogHouse/pandoc-uikit.git
       
       - name: Pandoc tex conversion
         uses: docker://pandoc/latex:2.9.0
@@ -140,10 +140,15 @@ jobs:
             main.tex
             
       - name: Clone Repo with Checkout 
-        run: ls -al
-
-          
-
+        run: |
+          git add ./index.md
+          git commit -m "Generated new index.md"
+          git stash --include-untracked
+          git checkout docs
+          git rm ./index.md
+          git commit -m "Removed old index.md"
+          git cherry-pick master
+          git push
     
 
 
