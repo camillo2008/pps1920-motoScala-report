@@ -99,28 +99,48 @@ jobs:
     #needs: DeployJob
     runs-on: ubuntu-20.04
     steps:
-      - name: Setup Git repo
+      - name: Clone git repo
         uses: actions/checkout@v2
-      - name: Clone Repo with Checkout 
-        uses: docker://pandoc/latex:2.9.0
-        with:
-          args: >-  # allows you to break string into multiple lines
-            --standalone
-            --output=index.md
-            main.tex        
-      - name: Clone Repo with Checkout 
+        
+      - name: Setup git repo 
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git fetch --all
-          git add ./index.md
-          git commit -m "Generated new index.md"
-          git stash --include-untracked
-          git checkout docs
-          git rm ./index.md
-          git commit -m "Removed old index.md"
-          git cherry-pick master
-          git push 
+          
+      - name: Clone Pandoc dependency 
+        run: |
+          git clone git@github.com:SmartDogHouse/pandoc-uikit.git
+      
+      - name: Pandoc tex conversion
+        uses: docker://pandoc/latex:2.9.0
+        with:
+          args: >-
+            -s
+            -i
+            -N
+            -f latex+smart+auto_identifiers 
+            -t html5  
+            --filter=pandoc-citeproc 
+            --bibliography=./references.bib 
+            --listings 
+            --pdf-engine=pdflatex  
+            --template=./pandoc-uikit/template.html
+            --variable abstract="I'm an abstract"
+            --wrap=auto
+            --mathjax 
+            --toc 
+            --toc-depth 2 
+            -V template_css:./pandoc-uikit/uikit.css
+            -V block-headings 
+            -V theme:Warsaw 
+            -V toc-title:"Table of Contents" 
+            -V biblio-title:Whatever  
+            -o ./index.html
+            main.tex
+            
+      - name: Clone Repo with Checkout 
+        run: ls -al
 
           
 
