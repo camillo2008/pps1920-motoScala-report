@@ -125,7 +125,7 @@ jobs:
             --bibliography=./references.bib 
             --listings 
             --pdf-engine=pdflatex  
-            --template=./pandoc-uikit/template.html
+            --template=./pandoc-uikit/standalone.html
             --variable abstract="I'm an abstract"
             --wrap=auto
             --mathjax 
