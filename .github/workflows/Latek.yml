@@ -151,7 +151,9 @@ jobs:
           git rm ./index.html
           git commit -m "Removed old index.html"
           git rm -r ./pandoc-uikit/
+          echo -----------------------------------
           sl -al
+          echo -----------------------------------
           git commit -m "Removed old pandoc dependency"
           git cherry-pick master
           git push
