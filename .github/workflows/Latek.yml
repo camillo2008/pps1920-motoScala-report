@@ -149,8 +149,9 @@ jobs:
           git clean -f -d
           git checkout docs
           git rm --ignore-unmatch ./index.html
-          git commit -m "Removed old index.html"
+          git diff-index --quiet HEAD || git commit -m 'Removed old index.html'
           git rm -r --ignore-unmatch ./pandoc-uikit/
+          git diff-index --quiet HEAD || git commit -m 'Removed old pandoc dependency'
           git commit -m "Removed old pandoc dependency"
           echo -----------------------------------
           ls -al
