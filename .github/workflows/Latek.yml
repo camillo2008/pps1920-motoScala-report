@@ -166,6 +166,7 @@ jobs:
           git status
           git cherry-pick master~1
           git cherry-pick master
+          git push
     
 
 
