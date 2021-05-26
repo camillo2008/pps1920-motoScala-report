@@ -148,17 +148,15 @@ jobs:
           git commit -m "Update pandoc dependency"
           git clean -f -d
           git checkout docs
-          git rm ./index.html
+          git rm --ignore-unmatch ./index.html
           git commit -m "Removed old index.html"
-          git rm -r ./pandoc-uikit/
+          git rm -r --ignore-unmatch ./pandoc-uikit/
           git commit -m "Removed old pandoc dependency"
           echo -----------------------------------
           ls -al
           echo -----------------------------------
           git status
-          git cherry-pick master
-          git push
-          git cherry-pick master
+          git cherry-pick master~2
           git push
     
 
