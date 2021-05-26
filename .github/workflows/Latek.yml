@@ -151,10 +151,11 @@ jobs:
           git rm ./index.html
           git commit -m "Removed old index.html"
           git rm -r ./pandoc-uikit/
+          git commit -m "Removed old pandoc dependency"
           echo -----------------------------------
           sl -al
           echo -----------------------------------
-          git commit -m "Removed old pandoc dependency"
+          git status
           git cherry-pick master
           git push
           git cherry-pick master
