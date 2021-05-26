@@ -153,7 +153,7 @@ jobs:
           git rm -r ./pandoc-uikit/
           git commit -m "Removed old pandoc dependency"
           echo -----------------------------------
-          sl -al
+          ls -al
           echo -----------------------------------
           git status
           git cherry-pick master
