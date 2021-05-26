@@ -164,8 +164,7 @@ jobs:
           ls -al
           echo -----------------------------------
           git status
-          git cherry-pick master~2
-          git push
+          git cherry-pick master~1
     
 
 
