@@ -165,6 +165,7 @@ jobs:
           echo -----------------------------------
           git status
           git cherry-pick master~1
+          git cherry-pick master
     
 
 
