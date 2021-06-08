@@ -1,0 +1,11 @@
+name: Daily Pool
+on:
+  schedule:
+    - cron: '*/1 * * * '
+jobs:
+  DailyPoolJob:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Send curl message
+      shell: bash
+      run: curl -X POST -H 'Content-Type: application/json' -d '{"chat_id": "${{ secrets.TELEGRAM_TO }}", "options": ["Mattina","Pomeriggio","Tardo pomeriggio","Sera"], "question": "Domani a che ora vi organizzate?", "is_anonymous":false, "allows_multiple_answers":true}}' https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendPoll
