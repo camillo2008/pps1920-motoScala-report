@@ -2,6 +2,7 @@ name: Daily Pool
 on:
   schedule:
     - cron: "*/6 * * * *"
+  workflow_dispatch:
 jobs:
   DailyPoolJob:
     runs-on: ubuntu-20.04
