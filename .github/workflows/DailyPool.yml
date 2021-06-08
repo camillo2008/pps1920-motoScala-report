@@ -1,7 +1,7 @@
 name: Daily Pool
 on:
   schedule:
-    - cron: '*/1 * * * '
+    - cron: "*/1 * * * *"
 jobs:
   DailyPoolJob:
     runs-on: ubuntu-20.04
